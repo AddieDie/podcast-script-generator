@@ -1,4 +1,4 @@
-// Podcast Script Generator JavaScript
+
 
 class PodcastScriptGenerator {
   constructor() {
@@ -7,19 +7,87 @@ class PodcastScriptGenerator {
     this.scriptContent = document.getElementById("scriptContent");
     this.loadingOverlay = document.getElementById("loadingOverlay");
 
+    this.sampleDataSets = [
+      {
+        podcastName: "The Mindful Entrepreneur",
+        topic: "mental health and entrepreneurship",
+        episodeTitle: "Breaking Through Mental Barriers in Business",
+        hosts:
+          "Sarah — empathetic and insightful; Mike — practical and motivational",
+        targetAudience: "entrepreneurs and business professionals",
+        tone: "motivational",
+        duration: "30",
+        includeAds: true,
+        includeTimestamps: true,
+        includeTagline: true,
+      },
+      {
+        podcastName: "Tech Talk Weekly",
+        topic: "artificial intelligence and machine learning",
+        episodeTitle: "The Future of AI in Healthcare",
+        hosts:
+          "Alex — tech-savvy and analytical; Jordan — curious and questioning",
+        targetAudience: "tech enthusiasts and healthcare professionals",
+        tone: "educational",
+        duration: "45",
+        includeAds: false,
+        includeTimestamps: true,
+        includeTagline: true,
+      },
+      {
+        podcastName: "Comedy Corner",
+        topic: "everyday life and relationships",
+        episodeTitle: "Dating Disasters and Relationship Fails",
+        hosts: "Emma — hilarious and witty; Tom — sarcastic and observant",
+        targetAudience: "young adults and comedy lovers",
+        tone: "funny",
+        duration: "20",
+        includeAds: true,
+        includeTimestamps: false,
+        includeTagline: true,
+      },
+      {
+        podcastName: "Business Breakthrough",
+        topic: "startup strategies and funding",
+        episodeTitle: "From Idea to IPO: A Startup Journey",
+        hosts: "David — experienced entrepreneur; Lisa — financial expert",
+        targetAudience: "startup founders and investors",
+        tone: "professional",
+        duration: "60",
+        includeAds: true,
+        includeTimestamps: true,
+        includeTagline: false,
+      },
+      {
+        podcastName: "Heart to Heart",
+        topic: "personal growth and self-care",
+        episodeTitle: "Finding Your Inner Strength",
+        hosts:
+          "Maya — compassionate and wise; Chris — supportive and encouraging",
+        targetAudience: "people seeking personal development",
+        tone: "emotional",
+        duration: "25",
+        includeAds: false,
+        includeTimestamps: true,
+        includeTagline: true,
+      },
+    ];
+
     this.initializeEventListeners();
+
+    this.renderSampleOptions();
   }
 
   initializeEventListeners() {
     console.log("Initializing event listeners...");
 
-    // Form submission
+
     if (this.form) {
       this.form.addEventListener("submit", (e) => this.handleFormSubmit(e));
       console.log("Form submit listener added");
     }
 
-    // Output buttons
+
     const copyBtn = document.getElementById("copyBtn");
     const downloadBtn = document.getElementById("downloadBtn");
     const printBtn = document.getElementById("printBtn");
@@ -42,7 +110,7 @@ class PodcastScriptGenerator {
       console.log("New script button listener added");
     }
 
-    // Form buttons
+
     const fillSampleBtn = document.getElementById("fillSampleBtn");
     const clearFormBtn = document.getElementById("clearFormBtn");
 
@@ -67,6 +135,39 @@ class PodcastScriptGenerator {
     } else {
       console.error("Clear form button not found");
     }
+
+
+    const loadSampleBtn = document.getElementById("loadSampleBtn");
+    const previewSampleBtn = document.getElementById("previewSampleBtn");
+    const sampleSelect = document.getElementById("sampleSelect");
+    const sampleSearch = document.getElementById("sampleSearch");
+
+    if (loadSampleBtn) {
+      loadSampleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.loadSelectedSample();
+      });
+    }
+
+    if (previewSampleBtn) {
+      previewSampleBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.previewSelectedSample();
+      });
+    }
+
+    if (sampleSearch) {
+      sampleSearch.addEventListener("input", (e) => {
+        const term = e.target.value || "";
+        this.filterSampleOptions(term);
+      });
+    }
+
+    if (sampleSelect) {
+      sampleSelect.addEventListener("change", () => {
+
+      });
+    }
   }
 
   async handleFormSubmit(e) {
@@ -76,7 +177,7 @@ class PodcastScriptGenerator {
     const formData = new FormData(this.form);
     const podcastData = Object.fromEntries(formData);
 
-    // Add checkbox values
+
     podcastData.includeAds = document.getElementById("includeAds").checked;
     podcastData.includeTimestamps =
       document.getElementById("includeTimestamps").checked;
@@ -100,7 +201,7 @@ class PodcastScriptGenerator {
   }
 
   async generateScript(data) {
-    // Simulate API call delay
+
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
     return this.createScriptContent(data);
@@ -113,7 +214,7 @@ class PodcastScriptGenerator {
 
     let script = "";
 
-    // Header
+
     script += `🎙️ PODCAST SCRIPT\n`;
     script += `📻 ${data.podcastName}\n`;
     script += `📝 Episode: ${data.episodeTitle}\n`;
@@ -127,24 +228,24 @@ class PodcastScriptGenerator {
       script += `🏷️ TAGLINE: "${this.generateTagline(data)}"\n\n`;
     }
 
-    // Intro
+
     script += `🎵 [INTRO MUSIC - ${this.getIntroMusic(data.tone)}]\n\n`;
     script += `[${this.getTimestamp(0, data.includeTimestamps)}] `;
     script += `${this.generateIntro(data, hosts)}\n\n`;
 
-    // Main Content Segments
+
     const mainSegments = this.generateMainSegments(data, hosts, segments);
     script += mainSegments;
 
-    // Ad Breaks
+
     if (data.includeAds) {
       script += this.generateAdBreaks(data, duration);
     }
 
-    // Conclusion
+
     script += this.generateConclusion(data, hosts);
 
-    // Outro
+
     script += `\n🎵 [OUTRO MUSIC - ${this.getOutroMusic(data.tone)}]\n\n`;
     script += `📱 CALL TO ACTION:\n`;
     script += `• Follow us on social media\n`;
@@ -173,7 +274,7 @@ class PodcastScriptGenerator {
     const segments = [];
     const segmentDuration = Math.max(5, Math.floor(duration / 6));
 
-    // More segments for longer, more detailed scripts
+
     const segmentTypes = [
       "introduction",
       "main_topic_1",
@@ -211,42 +312,42 @@ class PodcastScriptGenerator {
   generateMainSegments(data, hosts, segments) {
     let content = "";
 
-    // Segment 1: Introduction
+
     content += `[${this.getTimestamp(
       segments[0].start,
       data.includeTimestamps
     )}] `;
     content += `${this.generateSegmentIntro(data, hosts)}\n\n`;
 
-    // Segment 2: Main Topic 1
+
     content += `[${this.getTimestamp(
       segments[1].start,
       data.includeTimestamps
     )}] `;
     content += `${this.generateMainTopic1(data, hosts)}\n\n`;
 
-    // Segment 3: Main Topic 2
+
     content += `[${this.getTimestamp(
       segments[2].start,
       data.includeTimestamps
     )}] `;
     content += `${this.generateMainTopic2(data, hosts)}\n\n`;
 
-    // Segment 4: Discussion
+
     content += `[${this.getTimestamp(
       segments[3].start,
       data.includeTimestamps
     )}] `;
     content += `${this.generateDiscussion(data, hosts)}\n\n`;
 
-    // Segment 5: Examples
+
     content += `[${this.getTimestamp(
       segments[4].start,
       data.includeTimestamps
     )}] `;
     content += `${this.generateExamples(data, hosts)}\n\n`;
 
-    // Segment 6: Conclusion
+
     content += `[${this.getTimestamp(
       segments[5].start,
       data.includeTimestamps
@@ -695,406 +796,27 @@ class PodcastScriptGenerator {
 
   fillSampleData() {
     try {
-      // Array of different sample data sets
-      const sampleDataSets = [
-        {
-          podcastName: "The Mindful Entrepreneur",
-          topic: "mental health and entrepreneurship",
-          episodeTitle: "Breaking Through Mental Barriers in Business",
-          hosts:
-            "Sarah — empathetic and insightful; Mike — practical and motivational",
-          targetAudience: "entrepreneurs and business professionals",
-          tone: "motivational",
-          duration: "30",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Tech Talk Weekly",
-          topic: "artificial intelligence and machine learning",
-          episodeTitle: "The Future of AI in Healthcare",
-          hosts:
-            "Alex — tech-savvy and analytical; Jordan — curious and questioning",
-          targetAudience: "tech enthusiasts and healthcare professionals",
-          tone: "educational",
-          duration: "45",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Comedy Corner",
-          topic: "everyday life and relationships",
-          episodeTitle: "Dating Disasters and Relationship Fails",
-          hosts: "Emma — hilarious and witty; Tom — sarcastic and observant",
-          targetAudience: "young adults and comedy lovers",
-          tone: "funny",
-          duration: "20",
-          includeAds: true,
-          includeTimestamps: false,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Business Breakthrough",
-          topic: "startup strategies and funding",
-          episodeTitle: "From Idea to IPO: A Startup Journey",
-          hosts: "David — experienced entrepreneur; Lisa — financial expert",
-          targetAudience: "startup founders and investors",
-          tone: "professional",
-          duration: "60",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: false,
-        },
-        {
-          podcastName: "Heart to Heart",
-          topic: "personal growth and self-care",
-          episodeTitle: "Finding Your Inner Strength",
-          hosts:
-            "Maya — compassionate and wise; Chris — supportive and encouraging",
-          targetAudience: "people seeking personal development",
-          tone: "emotional",
-          duration: "25",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Story Time",
-          topic: "urban legends and mysteries",
-          episodeTitle: "The Haunted History of Old Towns",
-          hosts: "Nina — mysterious storyteller; Ben — skeptical investigator",
-          targetAudience: "mystery lovers and history buffs",
-          tone: "storytelling",
-          duration: "40",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Fitness Focus",
-          topic: "workout routines and nutrition",
-          episodeTitle: "Building Muscle on a Plant-Based Diet",
-          hosts: "Jake — fitness trainer; Maria — nutritionist",
-          targetAudience: "fitness enthusiasts and health-conscious people",
-          tone: "motivational",
-          duration: "35",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Parenting Pro",
-          topic: "child development and parenting tips",
-          episodeTitle: "Raising Confident Kids in a Digital World",
-          hosts: "Dr. Sarah — child psychologist; Mark — experienced dad",
-          targetAudience: "parents and caregivers",
-          tone: "educational",
-          duration: "50",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Crypto Chronicles",
-          topic: "cryptocurrency and blockchain technology",
-          episodeTitle: "The Future of Digital Currency",
-          hosts: "Max — crypto expert; Zoe — blockchain developer",
-          targetAudience: "crypto investors and tech enthusiasts",
-          tone: "professional",
-          duration: "55",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Foodie Adventures",
-          topic: "culinary experiences and cooking techniques",
-          episodeTitle: "Mastering the Art of Sourdough Bread",
-          hosts: "Chef Maria — professional baker; Tony — home cook",
-          targetAudience: "food lovers and cooking enthusiasts",
-          tone: "casual",
-          duration: "35",
-          includeAds: true,
-          includeTimestamps: false,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Travel Tales",
-          topic: "adventure travel and cultural experiences",
-          episodeTitle: "Hidden Gems of Southeast Asia",
-          hosts: "Luna — travel blogger; Sam — adventure seeker",
-          targetAudience: "travel enthusiasts and adventure seekers",
-          tone: "storytelling",
-          duration: "45",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Climate Action",
-          topic: "environmental sustainability and climate change",
-          episodeTitle: "Building a Greener Future",
-          hosts:
-            "Dr. Green — environmental scientist; Maya — sustainability advocate",
-          targetAudience: "environmentally conscious individuals",
-          tone: "motivational",
-          duration: "40",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Gaming Galaxy",
-          topic: "video games and gaming culture",
-          episodeTitle: "The Evolution of Indie Games",
-          hosts: "Pixel — game developer; GamerGirl — streamer",
-          targetAudience: "gamers and game developers",
-          tone: "funny",
-          duration: "30",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Mindful Moments",
-          topic: "meditation and mindfulness practices",
-          episodeTitle: "Finding Peace in Chaos",
-          hosts: "Zen Master — meditation teacher; Peace — mindfulness coach",
-          targetAudience: "people seeking inner peace and mindfulness",
-          tone: "emotional",
-          duration: "25",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Science Stories",
-          topic: "scientific discoveries and research",
-          episodeTitle: "Breakthroughs in Quantum Physics",
-          hosts: "Dr. Quantum — physicist; Science — researcher",
-          targetAudience: "science enthusiasts and students",
-          tone: "educational",
-          duration: "60",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: false,
-        },
-        {
-          podcastName: "Art & Soul",
-          topic: "creative expression and artistic techniques",
-          episodeTitle: "Unleashing Your Creative Potential",
-          hosts: "Artist — professional painter; Muse — creative coach",
-          targetAudience: "artists and creative individuals",
-          tone: "motivational",
-          duration: "35",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Pet Care Pro",
-          topic: "animal care and pet training",
-          episodeTitle: "Understanding Your Dog's Behavior",
-          hosts: "Dr. Vet — veterinarian; Trainer — dog behaviorist",
-          targetAudience: "pet owners and animal lovers",
-          tone: "educational",
-          duration: "30",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Music Matters",
-          topic: "music production and songwriting",
-          episodeTitle: "Creating Your First Hit Song",
-          hosts: "Producer — music producer; Songwriter — lyricist",
-          targetAudience: "musicians and music producers",
-          tone: "professional",
-          duration: "50",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Home & Garden",
-          topic: "home improvement and gardening",
-          episodeTitle: "Creating Your Dream Garden",
-          hosts: "Gardener — landscape designer; DIY — home improvement expert",
-          targetAudience: "homeowners and gardening enthusiasts",
-          tone: "casual",
-          duration: "40",
-          includeAds: true,
-          includeTimestamps: false,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Health & Wellness",
-          topic: "nutrition and healthy living",
-          episodeTitle: "The Science of Intermittent Fasting",
-          hosts: "Dr. Health — nutritionist; Wellness — fitness coach",
-          targetAudience:
-            "health-conscious individuals and fitness enthusiasts",
-          tone: "educational",
-          duration: "35",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Finance Freedom",
-          topic: "personal finance and investing",
-          episodeTitle: "Building Wealth Through Real Estate",
-          hosts: "Investor — financial advisor; Wealth — real estate expert",
-          targetAudience: "young professionals and aspiring investors",
-          tone: "professional",
-          duration: "50",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Creative Corner",
-          topic: "photography and visual arts",
-          episodeTitle: "Mastering Portrait Photography",
-          hosts: "Lens — professional photographer; Frame — art director",
-          targetAudience: "photographers and visual artists",
-          tone: "educational",
-          duration: "45",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Language Learning",
-          topic: "language acquisition and cultural exchange",
-          episodeTitle: "Fluent in 90 Days: A Realistic Approach",
-          hosts: "Polyglot — language teacher; Globe — cultural expert",
-          targetAudience: "language learners and travel enthusiasts",
-          tone: "motivational",
-          duration: "30",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Productivity Pro",
-          topic: "time management and efficiency",
-          episodeTitle: "The Art of Deep Work",
-          hosts: "Focus — productivity coach; Flow — efficiency expert",
-          targetAudience: "professionals and entrepreneurs",
-          tone: "professional",
-          duration: "25",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "History Uncovered",
-          topic: "historical events and ancient civilizations",
-          episodeTitle: "The Lost City of Atlantis: Fact or Fiction?",
-          hosts:
-            "Historian — archaeology professor; Mystery — research scholar",
-          targetAudience: "history buffs and mystery enthusiasts",
-          tone: "storytelling",
-          duration: "55",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Spiritual Journey",
-          topic: "spirituality and personal growth",
-          episodeTitle: "Finding Your Life Purpose",
-          hosts: "Sage — spiritual teacher; Path — life coach",
-          targetAudience: "people seeking spiritual guidance",
-          tone: "emotional",
-          duration: "40",
-          includeAds: false,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Tech Startup",
-          topic: "entrepreneurship and innovation",
-          episodeTitle: "From Garage to IPO: Startup Success Stories",
-          hosts: "Founder — serial entrepreneur; Scale — venture capitalist",
-          targetAudience: "aspiring entrepreneurs and startup founders",
-          tone: "motivational",
-          duration: "60",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Comedy Central",
-          topic: "stand-up comedy and humor",
-          episodeTitle: "The Art of Making People Laugh",
-          hosts: "Joker — stand-up comedian; Punchline — comedy writer",
-          targetAudience: "comedy fans and aspiring comedians",
-          tone: "funny",
-          duration: "35",
-          includeAds: true,
-          includeTimestamps: false,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Wildlife Wonders",
-          topic: "animal behavior and conservation",
-          episodeTitle: "The Secret Lives of Dolphins",
-          hosts: "Marine — marine biologist; Ocean — wildlife researcher",
-          targetAudience: "animal lovers and nature enthusiasts",
-          tone: "educational",
-          duration: "45",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-        {
-          podcastName: "Fashion Forward",
-          topic: "fashion trends and style",
-          episodeTitle: "Sustainable Fashion Revolution",
-          hosts: "Style — fashion designer; Trend — sustainability advocate",
-          targetAudience: "fashion enthusiasts and eco-conscious consumers",
-          tone: "professional",
-          duration: "30",
-          includeAds: true,
-          includeTimestamps: true,
-          includeTagline: true,
-        },
-      ];
+      const sampleDataSets =
+        (this.sampleDataSets && this.sampleDataSets.length && this.sampleDataSets) ||
+        [
+          {
+            podcastName: "Quick Sample",
+            topic: "general",
+            episodeTitle: "Quick Sample Episode",
+            hosts: "Host — friendly",
+            targetAudience: "everyone",
+            tone: "casual",
+            duration: "15",
+            includeAds: false,
+            includeTimestamps: false,
+            includeTagline: false,
+          },
+        ];
 
-      // Randomly select a sample data set
       const randomIndex = Math.floor(Math.random() * sampleDataSets.length);
       const sampleData = sampleDataSets[randomIndex];
 
-      // Fill form fields
-      const podcastNameEl = document.getElementById("podcastName");
-      const topicEl = document.getElementById("topic");
-      const episodeTitleEl = document.getElementById("episodeTitle");
-      const hostsEl = document.getElementById("hosts");
-      const targetAudienceEl = document.getElementById("targetAudience");
-      const toneEl = document.getElementById("tone");
-      const durationEl = document.getElementById("duration");
-      const includeAdsEl = document.getElementById("includeAds");
-      const includeTimestampsEl = document.getElementById("includeTimestamps");
-      const includeTaglineEl = document.getElementById("includeTagline");
-
-      if (podcastNameEl) podcastNameEl.value = sampleData.podcastName;
-      if (topicEl) topicEl.value = sampleData.topic;
-      if (episodeTitleEl) episodeTitleEl.value = sampleData.episodeTitle;
-      if (hostsEl) hostsEl.value = sampleData.hosts;
-      if (targetAudienceEl) targetAudienceEl.value = sampleData.targetAudience;
-      if (toneEl) toneEl.value = sampleData.tone;
-      if (durationEl) durationEl.value = sampleData.duration;
-      if (includeAdsEl) includeAdsEl.checked = sampleData.includeAds;
-      if (includeTimestampsEl)
-        includeTimestampsEl.checked = sampleData.includeTimestamps;
-      if (includeTaglineEl)
-        includeTaglineEl.checked = sampleData.includeTagline;
-
-      // Show success message with random sample info
+      this.applySampleToForm(sampleData);
       this.showNotification(
         `Random sample loaded: "${sampleData.podcastName}" - ${sampleData.episodeTitle}. You can now generate a script or modify the fields.`,
         "success"
@@ -1108,6 +830,84 @@ class PodcastScriptGenerator {
     }
   }
 
+  applySampleToForm(sampleData) {
+    const podcastNameEl = document.getElementById("podcastName");
+    const topicEl = document.getElementById("topic");
+    const episodeTitleEl = document.getElementById("episodeTitle");
+    const hostsEl = document.getElementById("hosts");
+    const targetAudienceEl = document.getElementById("targetAudience");
+    const toneEl = document.getElementById("tone");
+    const durationEl = document.getElementById("duration");
+    const includeAdsEl = document.getElementById("includeAds");
+    const includeTimestampsEl = document.getElementById("includeTimestamps");
+    const includeTaglineEl = document.getElementById("includeTagline");
+
+    if (podcastNameEl) podcastNameEl.value = sampleData.podcastName || "";
+    if (topicEl) topicEl.value = sampleData.topic || "";
+    if (episodeTitleEl) episodeTitleEl.value = sampleData.episodeTitle || "";
+    if (hostsEl) hostsEl.value = sampleData.hosts || "";
+    if (targetAudienceEl) targetAudienceEl.value = sampleData.targetAudience || "";
+    if (toneEl) toneEl.value = sampleData.tone || "";
+    if (durationEl) durationEl.value = sampleData.duration || "";
+    if (includeAdsEl) includeAdsEl.checked = !!sampleData.includeAds;
+    if (includeTimestampsEl)
+      includeTimestampsEl.checked = !!sampleData.includeTimestamps;
+    if (includeTaglineEl) includeTaglineEl.checked = !!sampleData.includeTagline;
+  }
+
+  renderSampleOptions() {
+    const select = document.getElementById("sampleSelect");
+    if (!select || !this.sampleDataSets) return;
+
+    select.innerHTML = "";
+    this.sampleDataSets.forEach((s, idx) => {
+      const opt = document.createElement("option");
+      opt.value = String(idx);
+      opt.textContent = `${s.podcastName} — ${s.episodeTitle} (${s.topic})`;
+      select.appendChild(opt);
+    });
+  }
+
+  loadSelectedSample() {
+    const select = document.getElementById("sampleSelect");
+    if (!select) return this.showNotification("No sample select found", "error");
+    const idx = parseInt(select.value, 10);
+    if (Number.isNaN(idx) || !this.sampleDataSets[idx]) {
+      return this.showNotification("Please choose a valid sample.", "error");
+    }
+    const sample = this.sampleDataSets[idx];
+    this.applySampleToForm(sample);
+    this.showNotification(`Loaded sample: ${sample.podcastName}`, "success");
+  }
+
+  previewSelectedSample() {
+    const select = document.getElementById("sampleSelect");
+    if (!select) return this.showNotification("No sample select found", "error");
+    const idx = parseInt(select.value, 10);
+    if (Number.isNaN(idx) || !this.sampleDataSets[idx]) {
+      return this.showNotification("Please choose a valid sample to preview.", "error");
+    }
+    const sample = this.sampleDataSets[idx];
+    const script = this.createScriptContent(sample);
+    this.displayScript(script);
+  }
+
+  filterSampleOptions(term = "") {
+    const select = document.getElementById("sampleSelect");
+    if (!select) return;
+    const q = term.toLowerCase().trim();
+    select.innerHTML = "";
+    this.sampleDataSets.forEach((s, idx) => {
+      const combined = `${s.podcastName} ${s.episodeTitle} ${s.topic}`.toLowerCase();
+      if (!q || combined.includes(q)) {
+        const opt = document.createElement("option");
+        opt.value = String(idx);
+        opt.textContent = `${s.podcastName} — ${s.episodeTitle} (${s.topic})`;
+        select.appendChild(opt);
+      }
+    });
+  }
+
   clearForm() {
     if (confirm("Are you sure you want to clear all form data?")) {
       this.form.reset();
@@ -1116,7 +916,7 @@ class PodcastScriptGenerator {
   }
 
   showNotification(message, type = "info") {
-    // Create notification element
+
     const notification = document.createElement("div");
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -1132,7 +932,7 @@ class PodcastScriptGenerator {
             </div>
         `;
 
-    // Add styles
+
     notification.style.cssText = `
             position: fixed;
             top: 20px;
@@ -1156,12 +956,12 @@ class PodcastScriptGenerator {
 
     document.body.appendChild(notification);
 
-    // Animate in
+
     setTimeout(() => {
       notification.style.transform = "translateX(0)";
     }, 100);
 
-    // Remove after 3 seconds
+
     setTimeout(() => {
       notification.style.transform = "translateX(100%)";
       setTimeout(() => {
@@ -1181,7 +981,7 @@ class PodcastScriptGenerator {
   }
 }
 
-// Initialize the application when DOM is loaded
+
 function initializeApp() {
   console.log("DOM loaded, initializing PodcastScriptGenerator");
   try {
@@ -1192,10 +992,10 @@ function initializeApp() {
   }
 }
 
-// Check if DOM is already loaded
+
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", initializeApp);
 } else {
-  // DOM is already loaded
+
   initializeApp();
 }
