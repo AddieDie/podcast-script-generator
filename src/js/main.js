@@ -79,15 +79,11 @@ class PodcastScriptGenerator {
   }
 
   initializeEventListeners() {
-    console.log("Initializing event listeners...");
-
-
     if (this.form) {
       this.form.addEventListener("submit", (e) => this.handleFormSubmit(e));
-      console.log("Form submit listener added");
     }
 
-
+    // Output action buttons
     const copyBtn = document.getElementById("copyBtn");
     const downloadBtn = document.getElementById("downloadBtn");
     const printBtn = document.getElementById("printBtn");
@@ -95,48 +91,36 @@ class PodcastScriptGenerator {
 
     if (copyBtn) {
       copyBtn.addEventListener("click", () => this.copyScript());
-      console.log("Copy button listener added");
     }
     if (downloadBtn) {
       downloadBtn.addEventListener("click", () => this.downloadScript());
-      console.log("Download button listener added");
     }
     if (printBtn) {
       printBtn.addEventListener("click", () => this.printScript());
-      console.log("Print button listener added");
     }
     if (newScriptBtn) {
       newScriptBtn.addEventListener("click", () => this.resetForm());
-      console.log("New script button listener added");
     }
 
-
+    // Form action buttons
     const fillSampleBtn = document.getElementById("fillSampleBtn");
     const clearFormBtn = document.getElementById("clearFormBtn");
 
     if (fillSampleBtn) {
       fillSampleBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        console.log("Sample button clicked");
         this.fillSampleData();
       });
-      console.log("Sample button listener added");
-    } else {
-      console.error("Fill sample button not found");
     }
 
     if (clearFormBtn) {
       clearFormBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        console.log("Clear button clicked");
         this.clearForm();
       });
-      console.log("Clear button listener added");
-    } else {
-      console.error("Clear form button not found");
     }
 
-
+    // Sample library controls
     const loadSampleBtn = document.getElementById("loadSampleBtn");
     const previewSampleBtn = document.getElementById("previewSampleBtn");
     const sampleSelect = document.getElementById("sampleSelect");
@@ -163,20 +147,31 @@ class PodcastScriptGenerator {
       });
     }
 
-    if (sampleSelect) {
-      sampleSelect.addEventListener("change", () => {
-
+    // Clear validation errors on input
+    const formInputs = this.form.querySelectorAll('input, select, textarea');
+    formInputs.forEach(input => {
+      input.addEventListener('input', () => {
+        this.clearFieldError(input);
       });
-    }
+      input.addEventListener('change', () => {
+        this.clearFieldError(input);
+      });
+    });
   }
 
   async handleFormSubmit(e) {
     e.preventDefault();
-    console.log("Form submitted");
+    
+    // Clear previous validation errors
+    this.clearValidationErrors();
+
+    // Validate form
+    if (!this.validateForm()) {
+      return;
+    }
 
     const formData = new FormData(this.form);
     const podcastData = Object.fromEntries(formData);
-
 
     podcastData.includeAds = document.getElementById("includeAds").checked;
     podcastData.includeTimestamps =
@@ -184,6 +179,12 @@ class PodcastScriptGenerator {
     podcastData.includeTagline =
       document.getElementById("includeTagline").checked;
 
+    // Disable form during generation
+    const generateBtn = this.form.querySelector('.generate-btn');
+    if (generateBtn) {
+      generateBtn.disabled = true;
+    }
+    
     this.showLoading();
 
     try {
@@ -197,7 +198,86 @@ class PodcastScriptGenerator {
       );
     } finally {
       this.hideLoading();
+      // Re-enable form after generation
+      if (generateBtn) {
+        generateBtn.disabled = false;
+      }
     }
+  }
+
+  validateForm() {
+    let isValid = true;
+    const requiredFields = ['podcastName', 'topic', 'episodeTitle', 'hosts', 'targetAudience', 'tone', 'duration'];
+    
+    requiredFields.forEach(fieldId => {
+      const field = document.getElementById(fieldId);
+      if (!field || !field.value.trim()) {
+        this.showFieldError(field, `${this.getFieldLabel(fieldId)} is required`);
+        isValid = false;
+      } else {
+        this.clearFieldError(field);
+      }
+    });
+
+    // Validate hosts format
+    const hostsField = document.getElementById('hosts');
+    if (hostsField && hostsField.value.trim()) {
+      const hostsPattern = /^[^;]+(?:[—\-–][^;]+)?(?:;\s*[^;]+(?:[—\-–][^;]+)?)*$/;
+      if (!hostsPattern.test(hostsField.value.trim())) {
+        this.showFieldError(hostsField, 'Please format hosts as: "Name — description; Name — description"');
+        isValid = false;
+      }
+    }
+
+    if (!isValid) {
+      this.showNotification("Please fix the errors in the form", "error");
+    }
+
+    return isValid;
+  }
+
+  getFieldLabel(fieldId) {
+    const labels = {
+      podcastName: 'Podcast Name',
+      topic: 'Main Topic',
+      episodeTitle: 'Episode Title',
+      hosts: 'Hosts',
+      targetAudience: 'Target Audience',
+      tone: 'Tone/Style',
+      duration: 'Duration'
+    };
+    return labels[fieldId] || fieldId;
+  }
+
+  showFieldError(field, message) {
+    if (!field) return;
+    
+    field.classList.add('error');
+    field.setAttribute('aria-invalid', 'true');
+    
+    let errorMsg = field.parentElement.querySelector('.error-message');
+    if (!errorMsg) {
+      errorMsg = document.createElement('div');
+      errorMsg.className = 'error-message';
+      errorMsg.setAttribute('role', 'alert');
+      field.parentElement.appendChild(errorMsg);
+    }
+    errorMsg.textContent = message;
+  }
+
+  clearFieldError(field) {
+    if (!field) return;
+    field.classList.remove('error');
+    field.removeAttribute('aria-invalid');
+    const errorMsg = field.parentElement.querySelector('.error-message');
+    if (errorMsg) {
+      errorMsg.remove();
+    }
+  }
+
+  clearValidationErrors() {
+    const fields = this.form.querySelectorAll('.form-group input, .form-group select, .form-group textarea');
+    fields.forEach(field => this.clearFieldError(field));
   }
 
   async generateScript(data) {
@@ -717,43 +797,137 @@ class PodcastScriptGenerator {
   }
 
   displayScript(script) {
-    this.scriptContent.textContent = script;
+    // Format script with HTML for better readability
+    const formattedScript = this.formatScriptForDisplay(script);
+    this.scriptContent.innerHTML = formattedScript;
     this.outputSection.style.display = "block";
-    this.outputSection.scrollIntoView({ behavior: "smooth" });
+    
+    // Focus management for accessibility
+    const firstAction = this.outputSection.querySelector(".action-btn");
+    if (firstAction) {
+      firstAction.focus();
+    }
+    
+    this.outputSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  formatScriptForDisplay(script) {
+    // Convert plain text script to formatted HTML
+    let html = script
+      .split('\n')
+      .map(line => {
+        if (!line.trim()) return '<br>';
+        
+        // Format headers/sections
+        if (line.match(/^(🎙️|📻|📝|⏱️|🎯|🎭|🏷️|🎵|📱|🎬)/)) {
+          return `<div class="script-header">${this.escapeHtml(line)}</div>`;
+        }
+        
+        // Format timestamps
+        if (line.match(/^\[[\d:]+]/)) {
+          return `<div class="script-timestamp">${this.escapeHtml(line)}</div>`;
+        }
+        
+        // Format ad breaks
+        if (line.includes('AD BREAK')) {
+          return `<div class="script-ad-break">${this.escapeHtml(line)}</div>`;
+        }
+        
+        // Format speaker names (if detected)
+        const speakerMatch = line.match(/^([A-Z][a-z]+):\s*/);
+        if (speakerMatch) {
+          const speaker = speakerMatch[1];
+          const dialogue = line.substring(speaker.length + 1);
+          return `<div class="script-speaker"><span class="speaker-name">${speaker}:</span> ${this.escapeHtml(dialogue)}</div>`;
+        }
+        
+        // Regular content
+        return `<div class="script-line">${this.escapeHtml(line)}</div>`;
+      })
+      .join('');
+    
+    return html;
+  }
+
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   copyScript() {
+    // Get the plain text version of the script for copying
+    const scriptText = this.scriptContent.textContent || this.scriptContent.innerText;
+    
+    if (!scriptText || !scriptText.trim()) {
+      this.showNotification("No script content to copy.", "error");
+      return;
+    }
+
     navigator.clipboard
-      .writeText(this.scriptContent.textContent)
+      .writeText(scriptText)
       .then(() => {
         const btn = document.getElementById("copyBtn");
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
         btn.classList.add("success");
+        btn.setAttribute("aria-label", "Script copied to clipboard");
 
         setTimeout(() => {
           btn.innerHTML = originalText;
           btn.classList.remove("success");
+          btn.removeAttribute("aria-label");
         }, 2000);
 
         this.showNotification("Script copied to clipboard!", "success");
       })
       .catch((err) => {
         console.error("Failed to copy: ", err);
-        this.showNotification(
-          "Failed to copy script. Please try again.",
-          "error"
-        );
+        // Fallback for older browsers
+        this.fallbackCopyText(scriptText);
       });
   }
 
+  fallbackCopyText(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+      document.execCommand('copy');
+      this.showNotification("Script copied to clipboard!", "success");
+    } catch (err) {
+      console.error("Fallback copy failed: ", err);
+      this.showNotification("Failed to copy script. Please try again.", "error");
+    }
+    
+    document.body.removeChild(textArea);
+  }
+
   downloadScript() {
-    const script = this.scriptContent.textContent;
+    const script = this.scriptContent.textContent || this.scriptContent.innerText;
+    
+    if (!script.trim()) {
+      this.showNotification("No script content to download.", "error");
+      return;
+    }
+
+    // Get podcast name from form for better filename
+    const podcastName = document.getElementById("podcastName")?.value || "podcast";
+    const episodeTitle = document.getElementById("episodeTitle")?.value || "script";
+    const sanitizedPodcastName = podcastName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const sanitizedEpisodeTitle = episodeTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    
     const blob = new Blob([script], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `podcast-script-${Date.now()}.txt`;
+    a.download = `${sanitizedPodcastName}-${sanitizedEpisodeTitle}-${Date.now()}.txt`;
+    a.setAttribute("aria-label", "Download script");
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -763,7 +937,13 @@ class PodcastScriptGenerator {
   }
 
   printScript() {
-    const scriptContent = this.scriptContent.textContent;
+    const scriptContent = this.scriptContent.textContent || this.scriptContent.innerText;
+    
+    if (!scriptContent || !scriptContent.trim()) {
+      this.showNotification("No script content to print.", "error");
+      return;
+    }
+    
     const printWindow = window.open("", "_blank");
     printWindow.document.write(`
             <html>
@@ -916,9 +1096,10 @@ class PodcastScriptGenerator {
   }
 
   showNotification(message, type = "info") {
-
     const notification = document.createElement("div");
     notification.className = `notification notification-${type}`;
+    notification.setAttribute("role", "alert");
+    notification.setAttribute("aria-live", "polite");
     notification.innerHTML = `
             <div class="notification-content">
                 <i class="fas fa-${
@@ -932,36 +1113,14 @@ class PodcastScriptGenerator {
             </div>
         `;
 
-
-    notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${
-              type === "success"
-                ? "#48bb78"
-                : type === "error"
-                ? "#f56565"
-                : "#4299e1"
-            };
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1001;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            max-width: 400px;
-        `;
-
     document.body.appendChild(notification);
 
-
-    setTimeout(() => {
+    // Trigger animation
+    requestAnimationFrame(() => {
       notification.style.transform = "translateX(0)";
-    }, 100);
+    });
 
-
+    // Auto-remove after delay
     setTimeout(() => {
       notification.style.transform = "translateX(100%)";
       setTimeout(() => {
@@ -983,12 +1142,20 @@ class PodcastScriptGenerator {
 
 
 function initializeApp() {
-  console.log("DOM loaded, initializing PodcastScriptGenerator");
   try {
     new PodcastScriptGenerator();
-    console.log("PodcastScriptGenerator initialized successfully");
   } catch (error) {
     console.error("Error initializing PodcastScriptGenerator:", error);
+    // Show user-friendly error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'notification notification-error';
+    errorDiv.style.display = 'block';
+    errorDiv.style.position = 'fixed';
+    errorDiv.style.top = '20px';
+    errorDiv.style.right = '20px';
+    errorDiv.style.transform = 'translateX(0)';
+    errorDiv.innerHTML = '<div class="notification-content"><i class="fas fa-exclamation-circle"></i><span>Failed to initialize application. Please refresh the page.</span></div>';
+    document.body.appendChild(errorDiv);
   }
 }
 
