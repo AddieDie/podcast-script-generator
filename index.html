@@ -1,263 +1,373 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Podcast Script Generator</title>
-    <link rel="stylesheet" href="./src/css/style.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
-  </head>
-  <body>
-    <div class="container">
-      <header class="header">
-        <div class="header-content">
-          <h1><i class="fas fa-microphone" aria-hidden="true"></i> Podcast Script Generator</h1>
-          <p>
-            Create engaging podcast scripts tailored to your show's style and
-            audience
-          </p>
-        </div>
-      </header>
-
-      <main class="main-content">
-        <div class="tips-section">
-          <div class="tips-container">
-            <h3><i class="fas fa-lightbulb"></i> Quick Tips</h3>
-            <div class="tips-grid">
-              <div class="tip-item">
-                <i class="fas fa-users"></i>
-                <span
-                  >Be specific about your target audience for better
-                  content</span
-                >
-              </div>
-              <div class="tip-item">
-                <i class="fas fa-microphone"></i>
-                <span
-                  >Include distinct host personalities for natural
-                  dialogue</span
-                >
-              </div>
-              <div class="tip-item">
-                <i class="fas fa-clock"></i>
-                <span>Choose realistic durations for your content type</span>
-              </div>
-              <div class="tip-item">
-                <i class="fas fa-dice"></i>
-                <span
-                  >Click "Random Sample" to get different podcast examples</span
-                >
-              </div>
+   <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta
+         name="description"
+         content="Create engaging podcast scripts tailored to your show's style and audience. Free podcast script generator with customizable templates."
+      />
+      <title>Podcast Script Generator</title>
+      <link rel="stylesheet" href="./src/css/style.css" />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+         rel="stylesheet"
+      />
+      <link
+         rel="stylesheet"
+         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      />
+   </head>
+   <body>
+      <button
+         id="themeToggle"
+         class="theme-toggle"
+         aria-label="Toggle dark mode"
+         title="Toggle dark/light mode"
+      >
+         <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <div class="container">
+         <header class="header">
+            <div class="header-content">
+               <h1>
+                  <i class="fas fa-microphone" aria-hidden="true"></i> Podcast
+                  Script Generator
+               </h1>
+               <p>
+                  Create engaging podcast scripts tailored to your show's style
+                  and audience
+               </p>
             </div>
-          </div>
-        </div>
+         </header>
 
-        <div class="form-output-grid">
-          <div class="form-section">
-            <div class="form-container">
-              <h2>Podcast Details</h2>
-              <form id="podcastForm" class="podcast-form">
-                <div class="form-group">
-                  <label for="podcastName">Podcast Name *</label>
-                  <input
-                    type="text"
-                    id="podcastName"
-                    name="podcastName"
-                    placeholder="e.g., The Mindful Entrepreneur"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="topic">Main Topic *</label>
-                  <input
-                    type="text"
-                    id="topic"
-                    name="topic"
-                    placeholder="e.g., mental health, business, gaming, relationships, technology"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="episodeTitle">Episode Title *</label>
-                  <input
-                    type="text"
-                    id="episodeTitle"
-                    name="episodeTitle"
-                    placeholder="e.g., Breaking Through Mental Barriers"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="hosts">Hosts *</label>
-                  <textarea
-                    id="hosts"
-                    name="hosts"
-                    placeholder="e.g., Alex — curious and humorous; Jamie — analytical and calm"
-                    required
-                  ></textarea>
-                </div>
-
-                <div class="form-group">
-                  <label for="targetAudience">Target Audience *</label>
-                  <input
-                    type="text"
-                    id="targetAudience"
-                    name="targetAudience"
-                    placeholder="e.g., young entrepreneurs, students, music lovers"
-                    required
-                  />
-                </div>
-
-                <div class="form-group">
-                  <label for="tone">Tone/Style *</label>
-                  <select id="tone" name="tone" required>
-                    <option value="">Select a tone...</option>
-                    <option value="casual">Casual</option>
-                    <option value="funny">Funny</option>
-                    <option value="professional">Professional</option>
-                    <option value="educational">Educational</option>
-                    <option value="emotional">Emotional</option>
-                    <option value="motivational">Motivational</option>
-                    <option value="storytelling">Storytelling</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label for="duration">Duration *</label>
-                  <select id="duration" name="duration" required>
-                    <option value="">Select duration...</option>
-                    <option value="10">10 minutes</option>
-                    <option value="15">15 minutes</option>
-                    <option value="20">20 minutes</option>
-                    <option value="30">30 minutes</option>
-                    <option value="45">45 minutes</option>
-                    <option value="60">1 hour</option>
-                    <option value="90">1.5 hours</option>
-                    <option value="120">2 hours</option>
-                  </select>
-                </div>
-
-                <div class="form-group checkbox-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="includeAds" name="includeAds" />
-                    <span class="checkmark"></span>
-                    Include ad reads/sponsor breaks
-                  </label>
-                </div>
-
-                <div class="form-group checkbox-group">
-                  <label class="checkbox-label">
-                    <input
-                      type="checkbox"
-                      id="includeTimestamps"
-                      name="includeTimestamps"
-                    />
-                    <span class="checkmark"></span>
-                    Include timestamps for segments
-                  </label>
-                </div>
-
-                <div class="form-group checkbox-group">
-                  <label class="checkbox-label">
-                    <input
-                      type="checkbox"
-                      id="includeTagline"
-                      name="includeTagline"
-                    />
-                    <span class="checkmark"></span>
-                    Generate catchy tagline/summary
-                  </label>
-                </div>
-
-                <div class="form-actions">
-                  <button type="button" id="fillSampleBtn" class="sample-btn" aria-label="Fill form with random sample data">
-                    <i class="fas fa-dice" aria-hidden="true"></i>
-                    Random Sample
-                  </button>
-                  <button type="button" id="clearFormBtn" class="clear-btn" aria-label="Clear all form fields">
-                    <i class="fas fa-trash" aria-hidden="true"></i>
-                    Clear Form
-                  </button>
-                  <button type="submit" class="generate-btn" aria-label="Generate podcast script">
-                    <i class="fas fa-magic" aria-hidden="true"></i>
-                    Generate Script
-                  </button>
-                </div>
-
-                  
-                  <div class="sample-library" aria-label="Sample library">
-                    <details>
-                      <summary>Sample Library — pick a sample to load or preview</summary>
-                      <div class="sample-controls">
-                        <input id="sampleSearch" type="search" placeholder="Search samples (topic, name)" aria-label="Search samples" />
-                        <select id="sampleSelect" aria-label="Select sample" class="sample-select">
-                          
-                        </select>
-                        <div class="sample-buttons">
-                          <button type="button" id="loadSampleBtn" class="action-btn" aria-label="Load selected sample into form">Load Selected</button>
-                          <button type="button" id="previewSampleBtn" class="action-btn" aria-label="Preview selected sample script">Preview Selected</button>
-                        </div>
-                        <p class="sample-note">Tip: use "Random Sample" for a quick example or choose a specific sample here.</p>
-                      </div>
-                    </details>
+         <main class="main-content">
+            <div class="tips-section">
+               <div class="tips-container">
+                  <h3><i class="fas fa-lightbulb"></i> Quick Tips</h3>
+                  <div class="tips-grid">
+                     <div class="tip-item">
+                        <i class="fas fa-users"></i>
+                        <span
+                           >Be specific about your target audience for better
+                           content</span
+                        >
+                     </div>
+                     <div class="tip-item">
+                        <i class="fas fa-microphone"></i>
+                        <span
+                           >Include distinct host personalities for natural
+                           dialogue</span
+                        >
+                     </div>
+                     <div class="tip-item">
+                        <i class="fas fa-clock"></i>
+                        <span
+                           >Choose realistic durations for your content
+                           type</span
+                        >
+                     </div>
+                     <div class="tip-item">
+                        <i class="fas fa-dice"></i>
+                        <span
+                           >Click "Random Sample" to get different podcast
+                           examples</span
+                        >
+                     </div>
                   </div>
-              </form>
+               </div>
             </div>
-          </div>
 
-          <div class="output-section" id="outputSection" style="display: none">
-            <div class="output-container">
-              <div class="output-header">
-                <h2>Generated Script</h2>
-                <div class="output-actions">
-                  <button id="copyBtn" class="action-btn" aria-label="Copy script to clipboard">
-                    <i class="fas fa-copy" aria-hidden="true"></i>
-                    Copy Script
-                  </button>
-                  <button id="downloadBtn" class="action-btn" aria-label="Download script as text file">
-                    <i class="fas fa-download" aria-hidden="true"></i>
-                    Download
-                  </button>
-                  <button id="printBtn" class="action-btn" aria-label="Print script">
-                    <i class="fas fa-print" aria-hidden="true"></i>
-                    Print
-                  </button>
-                  <button id="newScriptBtn" class="action-btn" aria-label="Start new script">
-                    <i class="fas fa-plus" aria-hidden="true"></i>
-                    New Script
-                  </button>
-                </div>
-              </div>
-              <div class="script-content" id="scriptContent" role="region" aria-label="Generated podcast script" aria-live="polite"></div>
+            <div class="form-output-grid">
+               <div class="form-section">
+                  <div class="form-container">
+                     <h2>Podcast Details</h2>
+                     <form id="podcastForm" class="podcast-form">
+                        <div class="form-group">
+                           <label for="podcastName">Podcast Name *</label>
+                           <input
+                              type="text"
+                              id="podcastName"
+                              name="podcastName"
+                              placeholder="e.g., The Mindful Entrepreneur"
+                              required
+                           />
+                        </div>
+
+                        <div class="form-group">
+                           <label for="topic">Main Topic *</label>
+                           <input
+                              type="text"
+                              id="topic"
+                              name="topic"
+                              placeholder="e.g., mental health, business, gaming, relationships, technology"
+                              required
+                           />
+                        </div>
+
+                        <div class="form-group">
+                           <label for="episodeTitle">Episode Title *</label>
+                           <input
+                              type="text"
+                              id="episodeTitle"
+                              name="episodeTitle"
+                              placeholder="e.g., Breaking Through Mental Barriers"
+                              required
+                           />
+                        </div>
+
+                        <div class="form-group">
+                           <label for="hosts">Hosts *</label>
+                           <textarea
+                              id="hosts"
+                              name="hosts"
+                              placeholder="e.g., Alex — curious and humorous; Jamie — analytical and calm"
+                              required
+                           ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                           <label for="targetAudience">Target Audience *</label>
+                           <input
+                              type="text"
+                              id="targetAudience"
+                              name="targetAudience"
+                              placeholder="e.g., young entrepreneurs, students, music lovers"
+                              required
+                           />
+                        </div>
+
+                        <div class="form-group">
+                           <label for="tone">Tone/Style *</label>
+                           <select id="tone" name="tone" required>
+                              <option value="">Select a tone...</option>
+                              <option value="casual">Casual</option>
+                              <option value="funny">Funny</option>
+                              <option value="professional">Professional</option>
+                              <option value="educational">Educational</option>
+                              <option value="emotional">Emotional</option>
+                              <option value="motivational">Motivational</option>
+                              <option value="storytelling">Storytelling</option>
+                           </select>
+                        </div>
+
+                        <div class="form-group">
+                           <label for="duration">Duration *</label>
+                           <select id="duration" name="duration" required>
+                              <option value="">Select duration...</option>
+                              <option value="10">10 minutes</option>
+                              <option value="15">15 minutes</option>
+                              <option value="20">20 minutes</option>
+                              <option value="30">30 minutes</option>
+                              <option value="45">45 minutes</option>
+                              <option value="60">1 hour</option>
+                              <option value="90">1.5 hours</option>
+                              <option value="120">2 hours</option>
+                           </select>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                           <label class="checkbox-label">
+                              <input
+                                 type="checkbox"
+                                 id="includeAds"
+                                 name="includeAds"
+                              />
+                              <span class="checkmark"></span>
+                              Include ad reads/sponsor breaks
+                           </label>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                           <label class="checkbox-label">
+                              <input
+                                 type="checkbox"
+                                 id="includeTimestamps"
+                                 name="includeTimestamps"
+                              />
+                              <span class="checkmark"></span>
+                              Include timestamps for segments
+                           </label>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                           <label class="checkbox-label">
+                              <input
+                                 type="checkbox"
+                                 id="includeTagline"
+                                 name="includeTagline"
+                              />
+                              <span class="checkmark"></span>
+                              Generate catchy tagline/summary
+                           </label>
+                        </div>
+
+                        <div class="form-actions">
+                           <button
+                              type="button"
+                              id="fillSampleBtn"
+                              class="sample-btn"
+                              aria-label="Fill form with random sample data"
+                           >
+                              <i class="fas fa-dice" aria-hidden="true"></i>
+                              Random Sample
+                           </button>
+                           <button
+                              type="button"
+                              id="clearFormBtn"
+                              class="clear-btn"
+                              aria-label="Clear all form fields"
+                           >
+                              <i class="fas fa-trash" aria-hidden="true"></i>
+                              Clear Form
+                           </button>
+                           <button
+                              type="submit"
+                              class="generate-btn"
+                              aria-label="Generate podcast script"
+                           >
+                              <i class="fas fa-magic" aria-hidden="true"></i>
+                              Generate Script
+                           </button>
+                        </div>
+
+                        <div class="sample-library" aria-label="Sample library">
+                           <details>
+                              <summary>
+                                 Sample Library — pick a sample to load or
+                                 preview
+                              </summary>
+                              <div class="sample-controls">
+                                 <input
+                                    id="sampleSearch"
+                                    type="search"
+                                    placeholder="Search samples (topic, name)"
+                                    aria-label="Search samples"
+                                 />
+                                 <select
+                                    id="sampleSelect"
+                                    aria-label="Select sample"
+                                    class="sample-select"
+                                 ></select>
+                                 <div class="sample-buttons">
+                                    <button
+                                       type="button"
+                                       id="loadSampleBtn"
+                                       class="action-btn"
+                                       aria-label="Load selected sample into form"
+                                    >
+                                       Load Selected
+                                    </button>
+                                    <button
+                                       type="button"
+                                       id="previewSampleBtn"
+                                       class="action-btn"
+                                       aria-label="Preview selected sample script"
+                                    >
+                                       Preview Selected
+                                    </button>
+                                 </div>
+                                 <p class="sample-note">
+                                    Tip: use "Random Sample" for a quick example
+                                    or choose a specific sample here.
+                                 </p>
+                              </div>
+                           </details>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+
+               <div
+                  class="output-section"
+                  id="outputSection"
+                  style="display: none"
+               >
+                  <div class="output-container">
+                     <div class="output-header">
+                        <h2>Generated Script</h2>
+                        <div class="output-actions">
+                           <button
+                              id="copyBtn"
+                              class="action-btn"
+                              aria-label="Copy script to clipboard"
+                           >
+                              <i class="fas fa-copy" aria-hidden="true"></i>
+                              Copy Script
+                           </button>
+                           <button
+                              id="downloadBtn"
+                              class="action-btn"
+                              aria-label="Download script as text file"
+                           >
+                              <i class="fas fa-download" aria-hidden="true"></i>
+                              Download
+                           </button>
+                           <button
+                              id="downloadMarkdownBtn"
+                              class="action-btn"
+                              aria-label="Download script as Markdown file"
+                           >
+                              <i
+                                 class="fas fa-file-code"
+                                 aria-hidden="true"
+                              ></i>
+                              Markdown
+                           </button>
+                           <button
+                              id="printBtn"
+                              class="action-btn"
+                              aria-label="Print script"
+                           >
+                              <i class="fas fa-print" aria-hidden="true"></i>
+                              Print
+                           </button>
+                           <button
+                              id="newScriptBtn"
+                              class="action-btn"
+                              aria-label="Start new script"
+                           >
+                              <i class="fas fa-plus" aria-hidden="true"></i>
+                              New Script
+                           </button>
+                        </div>
+                     </div>
+                     <div
+                        class="script-content"
+                        id="scriptContent"
+                        role="region"
+                        aria-label="Generated podcast script"
+                        aria-live="polite"
+                     ></div>
+                  </div>
+               </div>
             </div>
-          </div>
-        </div>
-      </main>
+         </main>
 
-      <footer class="footer">
-        <p>
-          Podcast Script Generator. Built with ❤️ by Addie for podcast frogs.
-        </p>
-      </footer>
-    </div>
-
-    <div class="loading-overlay" id="loadingOverlay" style="display: none">
-      <div class="loading-spinner">
-        <i class="fas fa-microphone fa-spin"></i>
-        <p>Generating your podcast script...</p>
+         <footer class="footer">
+            <p>
+               Podcast Script Generator. Built with ❤️ by Addie for podcast
+               frogs.
+            </p>
+            <p class="footer-links">
+               <a
+                  href="#"
+                  id="clearStorageBtn"
+                  class="footer-link"
+                  aria-label="Clear saved data"
+                  >Clear Saved Data</a
+               >
+            </p>
+         </footer>
       </div>
-    </div>
 
-    <script src="./src/js/main.js"></script>
-  </body>
+      <div class="loading-overlay" id="loadingOverlay" style="display: none">
+         <div class="loading-spinner">
+            <i class="fas fa-microphone fa-spin"></i>
+            <p>Generating your podcast script...</p>
+         </div>
+      </div>
+
+      <script src="./src/js/main.js"></script>
+   </body>
 </html>
