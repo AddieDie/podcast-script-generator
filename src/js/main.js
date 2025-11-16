@@ -6,6 +6,13 @@ class PodcastScriptGenerator {
     this.outputSection = document.getElementById("outputSection");
     this.scriptContent = document.getElementById("scriptContent");
     this.loadingOverlay = document.getElementById("loadingOverlay");
+    this.currentScript = null;
+
+    // Initialize theme
+    this.initTheme();
+
+    // Auto-save setup
+    this.setupAutoSave();
 
     this.sampleDataSets = [
       {
@@ -76,6 +83,88 @@ class PodcastScriptGenerator {
     this.initializeEventListeners();
 
     this.renderSampleOptions();
+
+    // Load saved form data
+    this.loadSavedFormData();
+  }
+
+  initTheme() {
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const savedTheme = localStorage.getItem("theme") || "light";
+    
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    this.updateThemeIcon(themeIcon, savedTheme);
+
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        const currentTheme = document.documentElement.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("theme", newTheme);
+        this.updateThemeIcon(themeIcon, newTheme);
+      });
+    }
+  }
+
+  updateThemeIcon(icon, theme) {
+    if (icon) {
+      icon.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
+    }
+  }
+
+  setupAutoSave() {
+    if (!this.form) return;
+
+    const formInputs = this.form.querySelectorAll('input, select, textarea');
+    formInputs.forEach(input => {
+      input.addEventListener('input', () => this.saveFormData());
+      input.addEventListener('change', () => this.saveFormData());
+    });
+  }
+
+  saveFormData() {
+    if (!this.form) return;
+
+    const formData = new FormData(this.form);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+      data[key] = value;
+    }
+    
+    // Save checkboxes
+    data.includeAds = document.getElementById("includeAds")?.checked || false;
+    data.includeTimestamps = document.getElementById("includeTimestamps")?.checked || false;
+    data.includeTagline = document.getElementById("includeTagline")?.checked || false;
+
+    try {
+      localStorage.setItem("podcastFormData", JSON.stringify(data));
+    } catch (e) {
+      console.warn("Could not save form data:", e);
+    }
+  }
+
+  loadSavedFormData() {
+    try {
+      const saved = localStorage.getItem("podcastFormData");
+      if (!saved) return;
+
+      const data = JSON.parse(saved);
+      
+      Object.keys(data).forEach(key => {
+        const field = document.getElementById(key);
+        if (field) {
+          if (field.type === "checkbox") {
+            field.checked = data[key];
+          } else {
+            field.value = data[key];
+          }
+        }
+      });
+    } catch (e) {
+      console.warn("Could not load saved form data:", e);
+    }
   }
 
   initializeEventListeners() {
@@ -86,8 +175,10 @@ class PodcastScriptGenerator {
     // Output action buttons
     const copyBtn = document.getElementById("copyBtn");
     const downloadBtn = document.getElementById("downloadBtn");
+    const downloadMarkdownBtn = document.getElementById("downloadMarkdownBtn");
     const printBtn = document.getElementById("printBtn");
     const newScriptBtn = document.getElementById("newScriptBtn");
+    const clearStorageBtn = document.getElementById("clearStorageBtn");
 
     if (copyBtn) {
       copyBtn.addEventListener("click", () => this.copyScript());
@@ -95,11 +186,20 @@ class PodcastScriptGenerator {
     if (downloadBtn) {
       downloadBtn.addEventListener("click", () => this.downloadScript());
     }
+    if (downloadMarkdownBtn) {
+      downloadMarkdownBtn.addEventListener("click", () => this.downloadMarkdown());
+    }
     if (printBtn) {
       printBtn.addEventListener("click", () => this.printScript());
     }
     if (newScriptBtn) {
       newScriptBtn.addEventListener("click", () => this.resetForm());
+    }
+    if (clearStorageBtn) {
+      clearStorageBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.clearStorage();
+      });
     }
 
     // Form action buttons
@@ -189,6 +289,7 @@ class PodcastScriptGenerator {
 
     try {
       const script = await this.generateScript(podcastData);
+      this.currentScript = script;
       this.displayScript(script);
     } catch (error) {
       console.error("Error generating script:", error);
@@ -909,7 +1010,7 @@ class PodcastScriptGenerator {
   }
 
   downloadScript() {
-    const script = this.scriptContent.textContent || this.scriptContent.innerText;
+    const script = this.currentScript || (this.scriptContent.textContent || this.scriptContent.innerText);
     
     if (!script.trim()) {
       this.showNotification("No script content to download.", "error");
@@ -934,6 +1035,87 @@ class PodcastScriptGenerator {
     URL.revokeObjectURL(url);
 
     this.showNotification("Script downloaded successfully!", "success");
+  }
+
+  downloadMarkdown() {
+    const script = this.currentScript || (this.scriptContent.textContent || this.scriptContent.innerText);
+    
+    if (!script.trim()) {
+      this.showNotification("No script content to download.", "error");
+      return;
+    }
+
+    // Convert script to Markdown format
+    const markdown = this.convertToMarkdown(script);
+
+    // Get podcast name from form for better filename
+    const podcastName = document.getElementById("podcastName")?.value || "podcast";
+    const episodeTitle = document.getElementById("episodeTitle")?.value || "script";
+    const sanitizedPodcastName = podcastName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const sanitizedEpisodeTitle = episodeTitle.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${sanitizedPodcastName}-${sanitizedEpisodeTitle}-${Date.now()}.md`;
+    a.setAttribute("aria-label", "Download script as Markdown");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    this.showNotification("Markdown file downloaded successfully!", "success");
+  }
+
+  convertToMarkdown(script) {
+    let markdown = script
+      .split('\n')
+      .map(line => {
+        if (!line.trim()) return '';
+        
+        // Convert headers
+        if (line.match(/^(🎙️|📻|📝|⏱️|🎯|🎭|🏷️|🎵|📱|🎬)/)) {
+          return `## ${line.replace(/^[🎙️📻📝⏱️🎯🎭🏷️🎵📱🎬]\s*/, '')}`;
+        }
+        
+        // Convert timestamps
+        if (line.match(/^\[[\d:]+]/)) {
+          return `\n**${line}**\n`;
+        }
+        
+        // Convert ad breaks
+        if (line.includes('AD BREAK')) {
+          return `\n---\n\n### ${line}\n\n---\n`;
+        }
+        
+        // Convert speaker names
+        const speakerMatch = line.match(/^([A-Z][a-z]+):\s*(.+)/);
+        if (speakerMatch) {
+          return `- **${speakerMatch[1]}**: ${speakerMatch[2]}`;
+        }
+        
+        // Regular content
+        return line;
+      })
+      .filter(line => line !== '')
+      .join('\n');
+    
+    return markdown;
+  }
+
+  clearStorage() {
+    if (confirm("Are you sure you want to clear all saved data? This will remove your saved form data and theme preference.")) {
+      localStorage.removeItem("podcastFormData");
+      localStorage.removeItem("theme");
+      this.showNotification("All saved data cleared!", "info");
+      // Reset theme to light
+      document.documentElement.setAttribute("data-theme", "light");
+      const themeIcon = document.getElementById("themeIcon");
+      if (themeIcon) {
+        themeIcon.className = "fas fa-moon";
+      }
+    }
   }
 
   printScript() {
@@ -970,6 +1152,9 @@ class PodcastScriptGenerator {
   resetForm() {
     this.form.reset();
     this.outputSection.style.display = "none";
+    this.currentScript = null;
+    // Clear saved form data
+    localStorage.removeItem("podcastFormData");
     this.form.scrollIntoView({ behavior: "smooth" });
     this.showNotification("Form reset successfully!", "info");
   }
